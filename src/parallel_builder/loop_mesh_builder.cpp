@@ -1,36 +1,38 @@
 /**
  * @file    loop_mesh_builder.cpp
  *
- * @author  FULL NAME <xlogin00@stud.fit.vutbr.cz>
+ * @author  Dominik Harmim <xharmi00@stud.fit.vutbr.cz>
  *
- * @brief   Parallel Marching Cubes implementation using OpenMP loops
+ * @brief   Parallel Marching Cubes implementation using OpenMP loops.
  *
- * @date    DATE
+ * @date    10 December 2019, 23:55
  **/
 
+
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <limits>
 
 #include "loop_mesh_builder.h"
 
-LoopMeshBuilder::LoopMeshBuilder(unsigned gridEdgeSize)
-    : BaseMeshBuilder(gridEdgeSize, "OpenMP Loop")
-{
 
+LoopMeshBuilder::LoopMeshBuilder(unsigned gridEdgeSize) : BaseMeshBuilder(gridEdgeSize, "OpenMP Loop")
+{
 }
 
-unsigned LoopMeshBuilder::marchCubes(const ParametricScalarField &field)
+
+auto LoopMeshBuilder::marchCubes(const ParametricScalarField &field) -> unsigned
 {
-    return 0;
+	return 0;
 }
 
-float LoopMeshBuilder::evaluateFieldAt(const Vec3_t<float> &pos, const ParametricScalarField &field)
+
+auto LoopMeshBuilder::evaluateFieldAt(const Vec3_t<float> &pos, const ParametricScalarField &field) -> float
 {
-    return 0.0f;
+	return .0F;
 }
+
 
 void LoopMeshBuilder::emitTriangle(const BaseMeshBuilder::Triangle_t &triangle)
 {
-
 }
