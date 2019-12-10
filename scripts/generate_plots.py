@@ -1,8 +1,6 @@
 import argparse
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
 import csv
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description='Generate scaling plots from measured data.')
 parser.add_argument('input', type=str, help='an input CSV file with measurement data')
@@ -24,14 +22,15 @@ with open(args.input, newline='') as inputFile:
             threadCnts.add(int(row['NUM_THREADS']))
             fieldElemsCnts.add(int(row['FIELD_ELEMENTS']))
 
-            tables[(row['BUILDER_NAME'], int(row['NUM_THREADS']), int(row['FIELD_ELEMENTS']))] = float(row['ELAPSED_TIME'])
+            tables[(row['BUILDER_NAME'], int(row['NUM_THREADS']), int(row['FIELD_ELEMENTS']))] = \
+                float(row['ELAPSED_TIME'])
 
         fig, ax = plt.subplots(nrows=1, ncols=2, sharey=True, figsize=(10, 5))
         for pltIdx in range(0, len(builderNames)):
             builderName = list(sorted(builderNames))[pltIdx]
             for elems in sorted(fieldElemsCnts):
                 ax[pltIdx].plot(sorted(threadCnts), [tables[(builderName, t, elems)] for t in sorted(threadCnts)],
-                                   label='{0}'.format(elems), marker='o')
+                                label='{0}'.format(elems), marker='o')
             ax[pltIdx].set(xlabel='Threads', ylabel='Time [ms]', title='Strong scaling: {0}'.format(builderName))
             ax[pltIdx].set_xscale('log', basex=2)
             ax[pltIdx].set_yscale('log', basey=2)
@@ -52,7 +51,8 @@ with open(args.input, newline='') as inputFile:
             threadCnts.add(int(row['NUM_THREADS']))
             fieldElemsCnts.add(int(row['FIELD_ELEMENTS']))
 
-            tables[(row['BUILDER_NAME'], int(row['NUM_THREADS']), int(row['FIELD_ELEMENTS']))] = float(row['ELAPSED_TIME'])
+            tables[(row['BUILDER_NAME'], int(row['NUM_THREADS']), int(row['FIELD_ELEMENTS']))] = \
+                float(row['ELAPSED_TIME'])
 
         fig, ax = plt.subplots(nrows=1, ncols=2, sharey=True, figsize=(10, 5))
         for pltIdx in range(0, len(sorted(builderNames))):
@@ -92,7 +92,7 @@ with open(args.input, newline='') as inputFile:
 
         fig, ax = plt.subplots()
         for name in sorted(builderNames):
-            ax.plot(list(map(lambda x: x**3, sorted(gridSizes))), [tables[(name, n)] for n in sorted(gridSizes)],
+            ax.plot(list(map(lambda x: x ** 3, sorted(gridSizes))), [tables[(name, n)] for n in sorted(gridSizes)],
                     label='{0}'.format(name), marker='o')
 
         ax.set_xscale('log', basex=2)
