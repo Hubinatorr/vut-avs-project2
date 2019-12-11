@@ -1,2 +1,5 @@
 /.idea/
 /src/cmake-build-*/
+/build/
+/tmp/
+/xharmi00.zip

@@ -3,7 +3,8 @@
  *
  * @author  Dominik Harmim <xharmi00@stud.fit.vutbr.cz>
  *
- * @brief   Parallel Marching Cubes implementation using OpenMP tasks + octree early elimination.
+ * @brief   Parallel Marching Cubes implementation using OpenMP tasks + octree
+ *          early elimination.
  *
  * @date    10 December 2019, 23:58
  **/
@@ -25,7 +26,9 @@ public:
 protected:
 	auto marchCubes(const ParametricScalarField &field) -> unsigned override;
 
-	auto evaluateFieldAt(const Vec3_t<float> &pos, const ParametricScalarField &field) -> float override;
+	auto evaluateFieldAt(
+		const Vec3_t<float> &pos, const ParametricScalarField &field
+	) -> float override;
 
 	void emitTriangle(const Triangle_t &triangle) override;
 

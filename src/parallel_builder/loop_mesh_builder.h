@@ -27,7 +27,9 @@ public:
 protected:
 	auto marchCubes(const ParametricScalarField &field) -> unsigned override;
 
-	auto evaluateFieldAt(const Vec3_t<float> &pos, const ParametricScalarField &field) -> float override;
+	auto evaluateFieldAt(
+		const Vec3_t<float> &pos, const ParametricScalarField &field
+	) -> float override;
 
 	void emitTriangle(const Triangle_t &triangle) override;
 

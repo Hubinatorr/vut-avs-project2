@@ -3,7 +3,8 @@
  *
  * @author  Dominik Harmim <xharmi00@stud.fit.vutbr.cz>
  *
- * @brief   Parallel Marching Cubes implementation using OpenMP tasks + octree early elimination.
+ * @brief   Parallel Marching Cubes implementation using OpenMP tasks + octree
+ *          early elimination.
  *
  * @date    11 December 2019, 00:02
  **/
@@ -16,7 +17,8 @@
 #include "tree_mesh_builder.h"
 
 
-TreeMeshBuilder::TreeMeshBuilder(unsigned gridEdgeSize) : BaseMeshBuilder(gridEdgeSize, "Octree")
+TreeMeshBuilder::TreeMeshBuilder(unsigned gridEdgeSize) :
+	BaseMeshBuilder(gridEdgeSize, "Octree")
 {
 }
 
@@ -32,7 +34,9 @@ auto TreeMeshBuilder::marchCubes(const ParametricScalarField &field) -> unsigned
 }
 
 
-auto TreeMeshBuilder::evaluateFieldAt(const Vec3_t<float> &pos, const ParametricScalarField &field) -> float
+auto TreeMeshBuilder::evaluateFieldAt(
+	const Vec3_t<float> &pos, const ParametricScalarField &field
+) -> float
 {
 	return .0F;
 }

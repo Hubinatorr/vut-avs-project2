@@ -49,11 +49,6 @@ public:
 	 */
 	void buildMesh(const ParametricScalarField &inputField, const std::string &meshFilename);
 
-	auto isInBatchMode() const -> bool
-	{
-		return mIsInBatchMode;
-	}
-
 	void setBatchMode(bool batchMode)
 	{
 		mIsInBatchMode = batchMode;
