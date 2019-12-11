@@ -8,7 +8,7 @@
  * @brief   AVS Assignment 2
  *          See: https://en.wikipedia.org/wiki/Marching_cubes
  *               https://en.wikipedia.org/wiki/Isosurface
- *               http://paulbourke.net/geometry/polygonise/
+ *               http://paulbourke.net/geometry/polygonise
  *
  * @date    10 December 2019, 23:23
  **/

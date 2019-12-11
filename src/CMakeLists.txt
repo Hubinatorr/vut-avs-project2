@@ -4,13 +4,13 @@ PROJECT(PMC CXX C)
 SET(CMAKE_CXX_STANDARD 11)
 
 IF(APPLE)
-	SET(LLVM_PATH "/usr/local/Cellar/llvm/9.0.0_1")
+	SET(LLVM_PATH "/usr/local/opt/llvm")
 
 	SET(CMAKE_C_COMPILER "${LLVM_PATH}/bin/clang")
 	SET(CMAKE_CXX_COMPILER "${LLVM_PATH}/bin/clang++")
 
-	SET(OpenMP_C_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument")
-	SET(OpenMP_CXX_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument")
+	SET(OpenMP_C_FLAGS "-fopenmp")
+	SET(OpenMP_CXX_FLAGS "-fopenmp")
 
 	SET(OpenMP_C_LIB_NAMES "libomp" "libgomp" "libiomp5")
 	SET(OpenMP_CXX_LIB_NAMES "libomp" "libgomp" "libiomp5")
@@ -18,6 +18,9 @@ IF(APPLE)
 	SET(OpenMP_libomp_LIBRARY ${OpenMP_C_LIB_NAMES})
 	SET(OpenMP_libgomp_LIBRARY ${OpenMP_C_LIB_NAMES})
 	SET(OpenMP_libiomp5_LIBRARY ${OpenMP_C_LIB_NAMES})
+
+	INCLUDE_DIRECTORIES("${LLVM_PATH}/include")
+	LINK_DIRECTORIES("${LLVM_PATH}/lib")
 ENDIF()
 
 FIND_PACKAGE(OpenMP REQUIRED)
@@ -39,4 +42,7 @@ INCLUDE_DIRECTORIES(common)
 INCLUDE_DIRECTORIES(parallel_builder)
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
+
+IF(NOT APPLE)
+	TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
+ENDIF()
