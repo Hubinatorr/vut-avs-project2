@@ -8,10 +8,26 @@ Login: xharmi00
 1) Kterou ze smyček (viz zadání) je vhodnější paralelizovat a co způsobuje
    neefektivitu paralelizace té druhé?
 
+- Vhodnější je paralelizovat smyčku průchodu mřížkou v 'marchCubes'.
+  Neefektivitu paralelizace druhé smyčky (výpočet minimální vzdálenosti
+  v 'evaluateFieldAt') pravděpodobně způsobuje lokalia dat.
+
+
 2) Jaké plánování (rozdělení práce mezi vlákna) jste zvolili a proč?
    Jaký vliv má velikost "chunk" při dynamickém plánování (8, 16, 32, 64)?
 
+- Při testování a měření všech třech způsobů plánování (static, dynamic
+  a guided), i s různými velikostmi "chunk" (1, 8, 16, 32, 64), jsem
+  nezaznamenal žádný výrazný rozdíl ve výkonu. Zvolil jsem tedy dynamické
+  plánování 'dynamic', protože provedení iterací obecně trvá různě dlouhou dobu.
+  Tímto bude zajištěno vyvážení zátěže. Pro velikost "chunk" jsem zvolil hodnotu
+  32, abych snížil synchronizační režii za běhu.
+
 3) Jakým způsobem zajišťujete ukládání trojúhelníků z několika vláken současně?
+
+- Zajišťuji to synchronizací vláken vzájemným vyloučením přidávání trojúhelníků
+  do pole všech trojúhelníků v metodě 'emitTriangle'. Toto přidávání
+  označuji jako kritickou sekci OpenMP direktivou '#pragma omp critical'.
 
 Úloha 2: Paralelní průchod stromem
 ===============================================================================

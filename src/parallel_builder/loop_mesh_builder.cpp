@@ -26,8 +26,8 @@ auto LoopMeshBuilder::marchCubes(const ParametricScalarField &field) -> unsigned
 	size_t cubesCount = pow(mGridSize, 3);
 	unsigned trianglesCount = 0;
 
-//#pragma omp parallel for default(none) shared(cubesCount) \
-//reduction(+:trianglesCount)
+#pragma omp parallel for default(none) shared(cubesCount, field) \
+reduction(+:trianglesCount) schedule(dynamic, 32)
 	for (size_t i = 0; i < cubesCount; i++)
 	{
 		Vec3_t<float> cubeOffset(
@@ -50,14 +50,14 @@ auto LoopMeshBuilder::evaluateFieldAt(
 	const auto pointsCount = unsigned(field.getPoints().size());
 	float minDistanceSquared = std::numeric_limits<float>::max();
 
-//#pragma omp parallel for default(none) shared(pointsCount, points) \
-//reduction(min:minDistanceSquared)
+//#pragma omp parallel for default(none) shared(pointsCount, pos, points) \
+//reduction(min:minDistanceSquared) schedule(static)
 	for (unsigned i = 0; i < pointsCount; i++)
 	{
 		float distanceSquared = (pos.x - points[i].x) * (pos.x - points[i].x)
 			+ (pos.y - points[i].y) * (pos.y - points[i].y)
 			+ (pos.z - points[i].z) * (pos.z - points[i].z);
-		minDistanceSquared = fminf(minDistanceSquared, distanceSquared);
+		minDistanceSquared = std::min(minDistanceSquared, distanceSquared);
 	}
 
 	return sqrtf(minDistanceSquared);
@@ -66,6 +66,6 @@ auto LoopMeshBuilder::evaluateFieldAt(
 
 void LoopMeshBuilder::emitTriangle(const BaseMeshBuilder::Triangle_t &triangle)
 {
-//#pragma omp critical(loop_emitTriangle)
+#pragma omp critical(loop_emitTriangle)
 	triangles.push_back(triangle);
 }
