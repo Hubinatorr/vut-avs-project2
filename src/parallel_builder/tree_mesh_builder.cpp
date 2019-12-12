@@ -25,57 +25,52 @@ TreeMeshBuilder::TreeMeshBuilder(unsigned gridEdgeSize) :
 
 auto TreeMeshBuilder::marchCubes(const ParametricScalarField &field) -> unsigned
 {
-	return decomposeSpace(mGridResolution, Vec3_t<float>(), field);
+	return decomposeSpace(mGridSize, Vec3_t<float>(), field);
 }
 
 
 auto TreeMeshBuilder::decomposeSpace(
-	const float edgeLength,
+	const unsigned gridSize,
 	const Vec3_t<float> &cubeOffset,
 	const ParametricScalarField &field
 ) -> unsigned
 {
 	unsigned trianglesCount = 0;
-	const float newEdgeLength = edgeLength / 2.F;
+	const unsigned newGridSize = gridSize / 2;
+	const auto edgeLength = float(newGridSize);
 	std::array<const Vec3_t<float>, 8> newCubeOffsets{
 		Vec3_t<float>(cubeOffset.x, cubeOffset.y, cubeOffset.z),
-		Vec3_t<float>(cubeOffset.x + newEdgeLength, cubeOffset.y, cubeOffset.z),
-		Vec3_t<float>(cubeOffset.x, cubeOffset.y + newEdgeLength, cubeOffset.z),
-		Vec3_t<float>(cubeOffset.x, cubeOffset.y, cubeOffset.z + newEdgeLength),
+		Vec3_t<float>(cubeOffset.x + edgeLength, cubeOffset.y, cubeOffset.z),
+		Vec3_t<float>(cubeOffset.x, cubeOffset.y + edgeLength, cubeOffset.z),
+		Vec3_t<float>(cubeOffset.x, cubeOffset.y, cubeOffset.z + edgeLength),
 		Vec3_t<float>(
-			cubeOffset.x + newEdgeLength,
-			cubeOffset.y + newEdgeLength,
-			cubeOffset.z
+			cubeOffset.x + edgeLength, cubeOffset.y + edgeLength, cubeOffset.z
 		),
 		Vec3_t<float>(
-			cubeOffset.x + newEdgeLength,
-			cubeOffset.y,
-			cubeOffset.z + newEdgeLength
+			cubeOffset.x + edgeLength, cubeOffset.y, cubeOffset.z + edgeLength
 		),
 		Vec3_t<float>(
-			cubeOffset.x,
-			cubeOffset.y + newEdgeLength,
-			cubeOffset.z + newEdgeLength
+			cubeOffset.x, cubeOffset.y + edgeLength, cubeOffset.z + edgeLength
 		),
 		Vec3_t<float>(
-			cubeOffset.x + newEdgeLength,
-			cubeOffset.y + newEdgeLength,
-			cubeOffset.z + newEdgeLength
+			cubeOffset.x + edgeLength,
+			cubeOffset.y + edgeLength,
+			cubeOffset.z + edgeLength
 		),
 	};
 
 	for (const Vec3_t<float> newCubeOffset : newCubeOffsets)
 	{
-		if (!isBlockEmpty(newEdgeLength, newCubeOffset, field))
+		if (!isBlockEmpty(edgeLength, newCubeOffset, field))
 		{
-			if (newEdgeLength < CUT_OFF)
+			if (newGridSize <= CUT_OFF)
 			{
 				trianglesCount += buildCube(newCubeOffset, field);
 			}
 			else
 			{
 				trianglesCount +=
-					decomposeSpace(newEdgeLength, newCubeOffset, field);
+					decomposeSpace(newGridSize, newCubeOffset, field);
 			}
 		}
 	}
@@ -85,16 +80,17 @@ auto TreeMeshBuilder::decomposeSpace(
 
 
 auto TreeMeshBuilder::isBlockEmpty(
-	const float edgeLength,
+	float edgeLength,
 	const Vec3_t<float> &cubeOffset,
 	const ParametricScalarField &field
 ) -> bool
 {
+	edgeLength *= mGridResolution;
 	const float halfEdgeLength = edgeLength / 2.F;
 	const Vec3_t<float> middlePoint(
-		cubeOffset.x + halfEdgeLength,
-		cubeOffset.y + halfEdgeLength,
-		cubeOffset.z + halfEdgeLength
+		cubeOffset.x * mGridResolution + halfEdgeLength,
+		cubeOffset.y * mGridResolution + halfEdgeLength,
+		cubeOffset.z * mGridResolution + halfEdgeLength
 	);
 	static const float exp = sqrtf(3.F) / 2.F;
 

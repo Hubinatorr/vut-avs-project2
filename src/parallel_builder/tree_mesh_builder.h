@@ -28,7 +28,7 @@ private:
 	auto marchCubes(const ParametricScalarField &field) -> unsigned override;
 
 	auto decomposeSpace(
-		float edgeLength,
+		unsigned gridSize,
 		const Vec3_t<float> &cubeOffset,
 		const ParametricScalarField &field
 	) -> unsigned;
@@ -51,7 +51,7 @@ private:
 	}
 
 
-	constexpr static const float CUT_OFF = 1.F;
+	static const unsigned CUT_OFF = 1;
 	std::vector<Triangle_t> triangles;
 };
 
