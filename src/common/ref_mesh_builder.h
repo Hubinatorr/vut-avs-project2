@@ -29,7 +29,7 @@ public:
 	explicit RefMeshBuilder(unsigned gridEdgeSize);
 
 
-protected:
+private:
 	auto marchCubes(const ParametricScalarField &field) -> unsigned override;
 
 	auto evaluateFieldAt(const Vec3_t<float> &pos, const ParametricScalarField &field) -> float override;

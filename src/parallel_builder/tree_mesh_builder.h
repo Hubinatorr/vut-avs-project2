@@ -6,13 +6,14 @@
  * @brief   Parallel Marching Cubes implementation using OpenMP tasks + octree
  *          early elimination.
  *
- * @date    10 December 2019, 23:58
+ * @date    12 December 2019, 17:16
  **/
 
 
 #ifndef TREE_MESH_BUILDER_H
 #define TREE_MESH_BUILDER_H
 
+#include <vector>
 
 #include "base_mesh_builder.h"
 
@@ -23,8 +24,20 @@ public:
 	explicit TreeMeshBuilder(unsigned gridEdgeSize);
 
 
-protected:
+private:
 	auto marchCubes(const ParametricScalarField &field) -> unsigned override;
+
+	auto decomposeSpace(
+		float edgeLength,
+		const Vec3_t<float> &cubeOffset,
+		const ParametricScalarField &field
+	) -> unsigned;
+
+	auto isBlockEmpty(
+		float edgeLength,
+		const Vec3_t<float> &cubeOffset,
+		const ParametricScalarField &field
+	) -> bool;
 
 	auto evaluateFieldAt(
 		const Vec3_t<float> &pos, const ParametricScalarField &field
@@ -34,8 +47,12 @@ protected:
 
 	auto getTrianglesArray() const -> const Triangle_t * override
 	{
-		return nullptr;
+		return triangles.data();
 	}
+
+
+	constexpr static const float CUT_OFF = 1.F;
+	std::vector<Triangle_t> triangles;
 };
 
 

@@ -84,7 +84,7 @@ public:
 	}
 
 
-protected:
+private:
 	/**
 	 * @brief Normalize the field so that all surfaces fall into range (0, 0, 0) - (mSize.x, mSize.y, mSize.z).
 	 */

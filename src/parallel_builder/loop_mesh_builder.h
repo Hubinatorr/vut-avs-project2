@@ -24,7 +24,7 @@ public:
 	explicit LoopMeshBuilder(unsigned gridEdgeSize);
 
 
-protected:
+private:
 	auto marchCubes(const ParametricScalarField &field) -> unsigned override;
 
 	auto evaluateFieldAt(

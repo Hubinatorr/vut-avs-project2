@@ -2,8 +2,9 @@ Architektury Výpočetních Systémů (AVS 2019)
 Projekt č. 2 (PMC)
 Login: xharmi00
 
+
 Úloha 1: Paralelizace původního řešení
-===============================================================================
+================================================================================
 
 1) Kterou ze smyček (viz zadání) je vhodnější paralelizovat a co způsobuje
    neefektivitu paralelizace té druhé?
@@ -23,26 +24,40 @@ Login: xharmi00
   Tímto bude zajištěno vyvážení zátěže. Pro velikost "chunk" jsem zvolil hodnotu
   32, abych snížil synchronizační režii za běhu.
 
+
 3) Jakým způsobem zajišťujete ukládání trojúhelníků z několika vláken současně?
 
 - Zajišťuji to synchronizací vláken vzájemným vyloučením přidávání trojúhelníků
   do pole všech trojúhelníků v metodě 'emitTriangle'. Toto přidávání
   označuji jako kritickou sekci OpenMP direktivou '#pragma omp critical'.
 
+
 Úloha 2: Paralelní průchod stromem
-===============================================================================
+================================================================================
 
 1) Stručně popište použití OpenMP tasků ve vašem řešení.
 
+-
+
+
 2) Jakým způsobem jste realizovali sesbírání celkového počtu trojúhelníků?
+
+-
+
 
 3) Jaký vliv má na vaše řešení tzv. "cut-off"? Je vhodné vytvářet nový
    task pro každou krychli na nejnižší úrovni?
 
+-
+
+
 4) Jakým způsobem zajišťujete ukládání trojúhelníků z několika vláken současně?
 
-Úloha 2: Grafy škálování obou řešení
-===============================================================================
+-
+
+
+Úloha 3: Grafy škálování obou řešení
+================================================================================
 
 1) Stručně zhodnoťte efektivitu vytvořených řešení (na základě grafů
    škálování).
