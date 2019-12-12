@@ -98,14 +98,14 @@ auto TreeMeshBuilder::isBlockEmpty(
 {
 	edgeLength *= mGridResolution;
 	const float halfEdgeLength = edgeLength / 2.F;
-	const Vec3_t<float> middlePoint(
+	const Vec3_t<float> midPoint(
 		cubeOffset.x * mGridResolution + halfEdgeLength,
 		cubeOffset.y * mGridResolution + halfEdgeLength,
 		cubeOffset.z * mGridResolution + halfEdgeLength
 	);
-	static const float exp = sqrtf(3.F) / 2.F;
+	static const float expr = sqrtf(3.F) / 2.F;
 
-	return evaluateFieldAt(middlePoint, field) > mIsoLevel + exp * edgeLength;
+	return evaluateFieldAt(midPoint, field) > mIsoLevel + expr * edgeLength;
 }
 
 
