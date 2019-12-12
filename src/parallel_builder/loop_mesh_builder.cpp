@@ -5,11 +5,10 @@
  *
  * @brief   Parallel Marching Cubes implementation using OpenMP loops.
  *
- * @date    10 December 2019, 23:55
+ * @date    12 December 2019, 00:31
  **/
 
 
-#include <iostream>
 #include <cmath>
 #include <limits>
 
@@ -24,7 +23,22 @@ LoopMeshBuilder::LoopMeshBuilder(unsigned gridEdgeSize) :
 
 auto LoopMeshBuilder::marchCubes(const ParametricScalarField &field) -> unsigned
 {
-	return 0;
+	size_t cubesCount = pow(mGridSize, 3);
+	unsigned trianglesCount = 0;
+
+//#pragma omp parallel for default(none) shared(cubesCount) \
+//reduction(+:trianglesCount)
+	for (size_t i = 0; i < cubesCount; i++)
+	{
+		Vec3_t<float> cubeOffset(
+			i % mGridSize,
+			(i / mGridSize) % mGridSize,
+			i / (mGridSize * mGridSize)
+		);
+		trianglesCount += buildCube(cubeOffset, field);
+	}
+
+	return trianglesCount;
 }
 
 
@@ -32,10 +46,26 @@ auto LoopMeshBuilder::evaluateFieldAt(
 	const Vec3_t<float> &pos, const ParametricScalarField &field
 ) -> float
 {
-	return .0F;
+	const Vec3_t<float> *points = field.getPoints().data();
+	const auto pointsCount = unsigned(field.getPoints().size());
+	float minDistanceSquared = std::numeric_limits<float>::max();
+
+//#pragma omp parallel for default(none) shared(pointsCount, points) \
+//reduction(min:minDistanceSquared)
+	for (unsigned i = 0; i < pointsCount; i++)
+	{
+		float distanceSquared = (pos.x - points[i].x) * (pos.x - points[i].x)
+			+ (pos.y - points[i].y) * (pos.y - points[i].y)
+			+ (pos.z - points[i].z) * (pos.z - points[i].z);
+		minDistanceSquared = fminf(minDistanceSquared, distanceSquared);
+	}
+
+	return sqrtf(minDistanceSquared);
 }
 
 
 void LoopMeshBuilder::emitTriangle(const BaseMeshBuilder::Triangle_t &triangle)
 {
+//#pragma omp critical(loop_emitTriangle)
+	triangles.push_back(triangle);
 }

@@ -5,7 +5,7 @@
  *
  * @brief   Parallel Marching Cubes implementation using OpenMP loops.
  *
- * @date    10 December 2019, 23:46
+ * @date    12 December 2019, 00:29
  **/
 
 
@@ -35,8 +35,11 @@ protected:
 
 	auto getTrianglesArray() const -> const Triangle_t * override
 	{
-		return nullptr;
+		return triangles.data();
 	}
+
+
+	std::vector<Triangle_t> triangles;
 };
 
 

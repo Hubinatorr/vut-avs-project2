@@ -6,7 +6,7 @@ Login: xharmi00
 ===============================================================================
 
 1) Kterou ze smyček (viz zadání) je vhodnější paralelizovat a co způsobuje
-   neefektivitu paralelizaci té druhé?
+   neefektivitu paralelizace té druhé?
 
 2) Jaké plánování (rozdělení práce mezi vlákna) jste zvolili a proč?
    Jaký vliv má velikost "chunk" při dynamickém plánování (8, 16, 32, 64)?
