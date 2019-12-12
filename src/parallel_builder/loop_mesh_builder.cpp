@@ -46,10 +46,20 @@ auto LoopMeshBuilder::evaluateFieldAt(
 	const Vec3_t<float> &pos, const ParametricScalarField &field
 ) -> float
 {
+//	const Vec3_t<float> *points = field.getPoints().data();
+//	const auto pointsCount = unsigned(field.getPoints().size());
 	float minDistanceSquared = std::numeric_limits<float>::max();
 
-//#pragma omp parallel for default(none) shared(pos, field) \
+//#pragma omp parallel for default(none) shared(pointsCount, pos, points) \
 //reduction(min:minDistanceSquared) schedule(static)
+//	for (unsigned i = 0; i < pointsCount; i++)
+//	{
+//		float distanceSquared =
+//			(pos.x - points[i].x) * (pos.x - points[i].x)
+//			+ (pos.y - points[i].y) * (pos.y - points[i].y)
+//			+ (pos.z - points[i].z) * (pos.z - points[i].z);
+//		minDistanceSquared = std::min(minDistanceSquared, distanceSquared);
+//	}
 	for (const Vec3_t<float> point : field.getPoints())
 	{
 		const float distanceSquared = (pos.x - point.x) * (pos.x - point.x)
