@@ -59,20 +59,31 @@ auto TreeMeshBuilder::decomposeSpace(
 		),
 	};
 
+//#pragma omp parallel
+//#pragma omp single nowait
 	for (const Vec3_t<float> newCubeOffset : newCubeOffsets)
 	{
+		unsigned childTrianglesCount = 0;
+
+//#pragma omp task default(none) \
+//shared(edgeLength, newCubeOffset, field, newGridSize, childTrianglesCount)
 		if (!isBlockEmpty(edgeLength, newCubeOffset, field))
 		{
 			if (newGridSize <= CUT_OFF)
 			{
-				trianglesCount += buildCube(newCubeOffset, field);
+//#pragma omp atomic write
+				childTrianglesCount += buildCube(newCubeOffset, field);
 			}
 			else
 			{
-				trianglesCount +=
+//#pragma omp atomic write
+				childTrianglesCount +=
 					decomposeSpace(newGridSize, newCubeOffset, field);
 			}
 		}
+
+//#pragma omp taskwait
+		trianglesCount += childTrianglesCount;
 	}
 
 	return trianglesCount;
@@ -118,5 +129,6 @@ auto TreeMeshBuilder::evaluateFieldAt(
 
 void TreeMeshBuilder::emitTriangle(const Triangle_t &triangle)
 {
+//#pragma omp critical(tree_emitTriangle)
 	triangles.push_back(triangle);
 }
