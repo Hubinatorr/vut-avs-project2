@@ -82,8 +82,8 @@ void TreeMeshBuilder::decomposeSpace(
 	const int threadNum = omp_get_thread_num();
 	for (const Vec3_t<float> newCubeOffset : newCubeOffsets)
 	{
-//#pragma omp task default(none) \
-//shared(edgeLength, newCubeOffset, field, newGridSize, totalTrianglesCount)
+#pragma omp task default(none) \
+shared(edgeLength, newCubeOffset, field, newGridSize, trianglesCounts)
 		if (!isBlockEmpty(edgeLength, newCubeOffset, field))
 		{
 			if (newGridSize <= CUT_OFF)
