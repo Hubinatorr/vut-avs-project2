@@ -13,7 +13,6 @@
 #include <cmath>
 #include <limits>
 #include <array>
-#include <omp.h>
 
 #include "tree_mesh_builder.h"
 
@@ -66,9 +65,21 @@ auto TreeMeshBuilder::decomposeSpace(
 		),
 	};
 
-	for (const Vec3_t<float> newCubeOffset : newCubeOffsets)
+	const size_t size = newCubeOffsets.size();
+	for (size_t i = 0; i < size; i++)
 	{
-		if (!isBlockEmpty(edgeLength, newCubeOffset, field))
+		const Vec3_t<float> newCubeOffset = newCubeOffsets[i];
+
+		float edgeLengthFoo = edgeLength * mGridResolution;
+		const float halfEdgeLength = edgeLength / 2.F;
+		const Vec3_t<float> midPoint(
+			cubeOffset.x * mGridResolution + halfEdgeLength,
+			cubeOffset.y * mGridResolution + halfEdgeLength,
+			cubeOffset.z * mGridResolution + halfEdgeLength
+		);
+		static const float expr = sqrtf(3.F) / 2.F;
+
+		if (evaluateFieldAt(midPoint, field) <= mIsoLevel + expr * edgeLengthFoo)
 		{
 			if (newGridSize <= CUT_OFF)
 			{
@@ -119,8 +130,11 @@ auto TreeMeshBuilder::evaluateFieldAt(
 {
 	float minDistanceSquared = std::numeric_limits<float>::max();
 
-	for (const Vec3_t<float> point : field.getPoints())
+	const size_t size = field.getPoints().size();
+	const Vec3_t<float> *points = field.getPoints().data();
+	for (size_t i = 0; i < size; i++)
 	{
+		const Vec3_t<float> point = points[i];
 		const float distanceSquared = (pos.x - point.x) * (pos.x - point.x)
 			+ (pos.y - point.y) * (pos.y - point.y)
 			+ (pos.z - point.z) * (pos.z - point.z);
