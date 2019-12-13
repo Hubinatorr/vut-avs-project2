@@ -27,16 +27,15 @@ TreeMeshBuilder::TreeMeshBuilder(unsigned gridEdgeSize) :
 auto TreeMeshBuilder::marchCubes(const ParametricScalarField &field) -> unsigned
 {
 	const int numThreads = omp_get_num_threads();
-	const auto *const trianglesCounts = new unsigned[numThreads];
+	auto *const trianglesCounts = new unsigned[numThreads];
+	for (int i = 0; i < numThreads; i++)
+	{
+		trianglesCounts[i] = 0;
+	}
 
 #pragma omp parallel default(none) shared(field, trianglesCounts)
 #pragma omp single nowait
-	decomposeSpace(
-		mGridSize,
-		Vec3_t<float>(),
-		field,
-		const_cast<unsigned int *>(trianglesCounts)
-	);
+	decomposeSpace(mGridSize, Vec3_t<float>(), field, trianglesCounts);
 
 	unsigned trianglesCount = 0;
 	for (int i = 0; i < numThreads; i++)
@@ -93,9 +92,9 @@ shared(edgeLength, newCubeOffset, field, newGridSize, trianglesCounts)
 			}
 			else
 			{
-#pragma omp atomic update
-				trianglesCounts[threadNum] +=
-					decomposeSpace(newGridSize, newCubeOffset, field);
+				decomposeSpace(
+					newGridSize, newCubeOffset, field, trianglesCounts
+				);
 			}
 		}
 	}
