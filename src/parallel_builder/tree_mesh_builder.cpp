@@ -65,27 +65,30 @@ auto TreeMeshBuilder::decomposeSpace(
 		),
 	};
 
-#pragma omp taskgroup
 	for (const Vec3_t<float> newCubeOffset : newCubeOffsets)
 	{
-#pragma omp task default(none) \
-shared(edgeLength, newCubeOffset, field, newGridSize, totalTrianglesCount)
+//#pragma omp task default(none) \
+//shared(edgeLength, newCubeOffset, field, newGridSize, totalTrianglesCount)
 		if (!isBlockEmpty(edgeLength, newCubeOffset, field))
 		{
 			if (newGridSize <= CUT_OFF)
 			{
-#pragma omp atomic update
+//#pragma omp atomic update
 				totalTrianglesCount += buildCube(newCubeOffset, field);
 			}
 			else
 			{
+#pragma omp task shared(totalTrianglesCount)
+				{
 #pragma omp atomic update
-				totalTrianglesCount +=
-					decomposeSpace(newGridSize, newCubeOffset, field);
+					totalTrianglesCount +=
+						decomposeSpace(newGridSize, newCubeOffset, field);
+				}
 			}
 		}
 	}
 
+#pragma omp taskwait
 	return totalTrianglesCount;
 }
 
