@@ -25,7 +25,15 @@ TreeMeshBuilder::TreeMeshBuilder(unsigned gridEdgeSize) :
 
 auto TreeMeshBuilder::marchCubes(const ParametricScalarField &field) -> unsigned
 {
-	return decomposeSpace(mGridSize, Vec3_t<float>(), field);
+	unsigned trianglesCount = 0;
+
+#pragma omp parallel default(none) shared(trianglesCount, field)
+	{
+#pragma omp single nowait
+		trianglesCount = decomposeSpace(mGridSize, Vec3_t<float>(), field);
+	}
+
+	return trianglesCount;
 }
 
 
@@ -35,7 +43,7 @@ auto TreeMeshBuilder::decomposeSpace(
 	const ParametricScalarField &field
 ) -> unsigned
 {
-	unsigned trianglesCount = 0;
+	unsigned totalTrianglesCount = 0;
 	const unsigned newGridSize = gridSize / 2;
 	const auto edgeLength = float(newGridSize);
 	std::array<const Vec3_t<float>, 8> newCubeOffsets{
@@ -59,34 +67,32 @@ auto TreeMeshBuilder::decomposeSpace(
 		),
 	};
 
-//#pragma omp parallel
-//#pragma omp single nowait
 	for (const Vec3_t<float> newCubeOffset : newCubeOffsets)
 	{
-		unsigned childTrianglesCount = 0;
-
-//#pragma omp task default(none) \
-//shared(edgeLength, newCubeOffset, field, newGridSize, childTrianglesCount)
 		if (!isBlockEmpty(edgeLength, newCubeOffset, field))
 		{
 			if (newGridSize <= CUT_OFF)
 			{
-//#pragma omp atomic write
-				childTrianglesCount += buildCube(newCubeOffset, field);
+				totalTrianglesCount += buildCube(newCubeOffset, field);
 			}
 			else
 			{
-//#pragma omp atomic write
-				childTrianglesCount +=
-					decomposeSpace(newGridSize, newCubeOffset, field);
+#pragma omp task default(none) \
+shared(newGridSize, newCubeOffset, field, totalTrianglesCount)
+				{
+					unsigned trianglesCount =
+						decomposeSpace(newGridSize, newCubeOffset, field);
+
+#pragma omp atomic update
+					totalTrianglesCount += trianglesCount;
+				}
 			}
 		}
-
-//#pragma omp taskwait
-		trianglesCount += childTrianglesCount;
 	}
 
-	return trianglesCount;
+#pragma omp taskwait
+
+	return totalTrianglesCount;
 }
 
 
@@ -129,6 +135,6 @@ auto TreeMeshBuilder::evaluateFieldAt(
 
 void TreeMeshBuilder::emitTriangle(const Triangle_t &triangle)
 {
-//#pragma omp critical(tree_emitTriangle)
+#pragma omp critical(tree_emitTriangle)
 	triangles.push_back(triangle);
 }
