@@ -28,11 +28,12 @@ public:
 private:
 	auto marchCubes(const ParametricScalarField &field) -> unsigned override;
 
-	auto decomposeSpace(
+	void decomposeSpace(
 		unsigned gridSize,
 		const Vec3_t<float> &cubeOffset,
-		const ParametricScalarField &field
-	) -> unsigned;
+		const ParametricScalarField &field,
+		unsigned *trianglesCounts
+	);
 
 	auto isBlockEmpty(
 		float edgeLength,
