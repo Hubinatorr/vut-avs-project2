@@ -26,35 +26,23 @@ TreeMeshBuilder::TreeMeshBuilder(unsigned gridEdgeSize) :
 
 auto TreeMeshBuilder::marchCubes(const ParametricScalarField &field) -> unsigned
 {
-	const int numThreads = omp_get_num_threads();
-	auto *const trianglesCounts = new unsigned[numThreads];
-	for (int i = 0; i < numThreads; i++)
-	{
-		trianglesCounts[i] = 0;
-	}
-
-#pragma omp parallel default(none) shared(field, trianglesCounts)
-#pragma omp single nowait
-	decomposeSpace(mGridSize, Vec3_t<float>(), field, trianglesCounts);
-
 	unsigned trianglesCount = 0;
-	for (int i = 0; i < numThreads; i++)
-	{
-		trianglesCount += trianglesCounts[i];
-	}
-	delete[] trianglesCounts;
+
+#pragma omp parallel default(none) shared(field, trianglesCount)
+#pragma omp single nowait
+	trianglesCount = decomposeSpace(mGridSize, Vec3_t<float>(), field);
 
 	return trianglesCount;
 }
 
 
-void TreeMeshBuilder::decomposeSpace(
+auto TreeMeshBuilder::decomposeSpace(
 	const unsigned gridSize,
 	const Vec3_t<float> &cubeOffset,
-	const ParametricScalarField &field,
-	unsigned *const trianglesCounts
-)
+	const ParametricScalarField &field
+) -> unsigned
 {
+	unsigned totalTrianglesCount = 0;
 	const unsigned newGridSize = gridSize / 2;
 	const auto edgeLength = float(newGridSize);
 	std::array<const Vec3_t<float>, 8> newCubeOffsets{
@@ -78,26 +66,31 @@ void TreeMeshBuilder::decomposeSpace(
 		),
 	};
 
-	const int threadNum = omp_get_thread_num();
 	for (const Vec3_t<float> newCubeOffset : newCubeOffsets)
 	{
-#pragma omp task default(none) \
-shared(edgeLength, newCubeOffset, field, newGridSize, trianglesCounts)
 		if (!isBlockEmpty(edgeLength, newCubeOffset, field))
 		{
 			if (newGridSize <= CUT_OFF)
 			{
-#pragma omp atomic update
-				trianglesCounts[threadNum] += buildCube(newCubeOffset, field);
+				totalTrianglesCount += buildCube(newCubeOffset, field);
 			}
 			else
 			{
-				decomposeSpace(
-					newGridSize, newCubeOffset, field, trianglesCounts
-				);
+#pragma omp task default(none) \
+shared(newGridSize, newCubeOffset, field, totalTrianglesCount)
+				{
+					unsigned trianglesCount =
+						decomposeSpace(newGridSize, newCubeOffset, field);
+
+#pragma omp atomic update
+					totalTrianglesCount += trianglesCount;
+				}
 			}
 		}
 	}
+
+#pragma omp taskwait
+	return totalTrianglesCount;
 }
 
 
