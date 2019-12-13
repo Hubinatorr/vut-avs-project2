@@ -28,10 +28,8 @@ auto TreeMeshBuilder::marchCubes(const ParametricScalarField &field) -> unsigned
 	unsigned trianglesCount = 0;
 
 #pragma omp parallel default(none) shared(trianglesCount, field)
-	{
 #pragma omp single nowait
-		trianglesCount = decomposeSpace(mGridSize, Vec3_t<float>(), field);
-	}
+	trianglesCount = decomposeSpace(mGridSize, Vec3_t<float>(), field);
 
 	return trianglesCount;
 }
@@ -67,30 +65,26 @@ auto TreeMeshBuilder::decomposeSpace(
 		),
 	};
 
+#pragma omp taskgroup
 	for (const Vec3_t<float> newCubeOffset : newCubeOffsets)
 	{
+#pragma omp task default(none) \
+shared(edgeLength, newCubeOffset, field, newGridSize, totalTrianglesCount)
 		if (!isBlockEmpty(edgeLength, newCubeOffset, field))
 		{
 			if (newGridSize <= CUT_OFF)
 			{
+#pragma omp atomic update
 				totalTrianglesCount += buildCube(newCubeOffset, field);
 			}
 			else
 			{
-#pragma omp task default(none) \
-shared(newGridSize, newCubeOffset, field, totalTrianglesCount)
-				{
-					unsigned trianglesCount =
-						decomposeSpace(newGridSize, newCubeOffset, field);
-
 #pragma omp atomic update
-					totalTrianglesCount += trianglesCount;
-				}
+				totalTrianglesCount +=
+					decomposeSpace(newGridSize, newCubeOffset, field);
 			}
 		}
 	}
-
-#pragma omp taskwait
 
 	return totalTrianglesCount;
 }
