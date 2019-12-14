@@ -86,17 +86,30 @@ Login: xharmi00
 1) Stručně zhodnoťte efektivitu vytvořených řešení (na základě grafů
    škálování).
 
--
+- Z grafu škálování vzhledem k velikosti mřížky je patrné, že pro dostatečně
+  velkou mřížku je stromový algoritmus o něco efektivnější. V případě menší
+  mřížky je tomu naopak. Při větších velikostech mřížky potom s rostoucí
+  velikostí mřížky roste i čas výpočtu přibližně lineárně. V grafu silného
+  škálování vzhledem k velikosti vstupu a počtu vláken je vidět, že stromový
+  algoritmus je efektivnější pro všechny testované případy. U obou řešení, pro
+  dostatečně velký vstup, čas výpočtu klesá s rostoucím počtem vláken.
+  U menších vstupů, při dosažení určitého počtu vláken, se klesání času výpočtu
+  zastaví nebo se dokonce i mírně zvýší. V grafu slabého škálování vhledem
+  k velikosti vstupu a počtu vláken je vidět, že u stromového algoritmu roste
+  zátěž na jedno vlákno s rostoucím počtem vláken. U druhého řešení je
+  u dostatečně velkého vstupu tato závislost přibližně konstantní.
 
 
 2) V jakém případě (v závislosti na počtu bodů ve vstupním souboru a velikosti
    mřížky) bude vaše řešení 1. úlohy neefektivní? (pokud takový případ
    existuje)
 
--
+- Řešení 1. úlohy bude neefektivní v případě, když bude malý vstup a velký
+  počet vláken.
 
 
 3) Je (nebo není) stromový algoritmus efektivnější z pohledu slabého škálování
    vzhledem ke vstupu?
 
--
+- Stromový algoritmus je z pohledu slabého škálování vzhledem ke vstupu
+  efektivnější.
