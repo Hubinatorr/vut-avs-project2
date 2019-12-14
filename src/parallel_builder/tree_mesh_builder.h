@@ -52,7 +52,7 @@ private:
 	}
 
 
-	static const unsigned CUT_OFF = 1;
+	static const unsigned GRID_SIZE_CUT_OFF = 1;
 	std::vector<Triangle_t> triangles;
 };
 
