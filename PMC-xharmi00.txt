@@ -37,23 +37,47 @@ Login: xharmi00
 
 1) Stručně popište použití OpenMP tasků ve vašem řešení.
 
--
+- V metodě 'marchCubes' se volá metoda 'decomposeSpace', která dělí prostor
+  na 8 potomků. Volání této metody je zde prováděno v sekci
+  '#pragma omp parallel', aby bylo možné uvnitř této metody vytvářet paralelní
+  tasky. V metodě 'marchCubes' je také použita OpenMP direktiva
+  '#pragma omp single', aby se na nejvyšší úrovni tahle metoda volala pouze
+  jedním vlánkem. Uvnitř metody 'decomposeSpace', kde se prostor dělí na
+  8 potomků, je pro každý z těchto podprostorů rekurzívně volána metoda
+  'decomposeSpace'. Pro každé tohle rekurzívní volání je vytvořen OpenMP task.
 
 
 2) Jakým způsobem jste realizovali sesbírání celkového počtu trojúhelníků?
 
--
+- Metoda 'decomposeSpace' vrací hodnotu 0, pokud je daný blok prázdný nebo
+  je vrácn počet vytvořených trojúhelníků voláním metody 'buildCube' v případě,
+  že bylo dosaženo předem specifikované hloubky. V opačném případě se vytvoří
+  sdílená proměnná, do které se přičítá počet vytvořených trojúhelníků na
+  nižších úrovních v jednotlivých tasks. V každém tasku je vytvořený počet
+  trojúhelníků (získaný rekurzívním voláním) uložen do privátní proměnné, která
+  je následně přičtena k celkovému počtu trojúhelníků ve sdílené proměnné,
+  a to atomicky použitím OpenMP direktivy '#pragma omp atomic update'. Před
+  vrácením celkového počtu trojúhelníků, na konci metody 'decomposeSpace', se
+  čeká až doběhnou vlákna potomků za použití OpenMP direktivy
+  '#pragma omp taskwait'.
 
 
 3) Jaký vliv má na vaše řešení tzv. "cut-off"? Je vhodné vytvářet nový
    task pro každou krychli na nejnižší úrovni?
 
--
+- Pokud je hloubka "cut-off" větší než 1, tak výpočet není přesný, jinými
+  slovy, nejsou vytvořeny všechny trojúhelníky. Pokud je tato hodnota naopak
+  menží než 1, tak můžou být některé trojúhelníky spočteny vícekrát a výpočet
+  potom trvá zbytečně déle. Proto jsem tuto hodnotu nastavil na 1. Na nejnižší
+  úrovni už nemá smysl vytvářet nový task, protože jediná úloha tasku na
+  nejnižší úrovni je samotné generování trojúhelníků.
 
 
 4) Jakým způsobem zajišťujete ukládání trojúhelníků z několika vláken současně?
 
--
+- Zajišťuji to synchronizací vláken vzájemným vyloučením přidávání trojúhelníků
+  do pole všech trojúhelníků v metodě 'emitTriangle'. Toto přidávání
+  označuji jako kritickou sekci OpenMP direktivou '#pragma omp critical'.
 
 
 Úloha 3: Grafy škálování obou řešení
@@ -62,9 +86,17 @@ Login: xharmi00
 1) Stručně zhodnoťte efektivitu vytvořených řešení (na základě grafů
    škálování).
 
+-
+
+
 2) V jakém případě (v závislosti na počtu bodů ve vstupním souboru a velikosti
    mřížky) bude vaše řešení 1. úlohy neefektivní? (pokud takový případ
    existuje)
 
+-
+
+
 3) Je (nebo není) stromový algoritmus efektivnější z pohledu slabého škálování
    vzhledem ke vstupu?
+
+-
