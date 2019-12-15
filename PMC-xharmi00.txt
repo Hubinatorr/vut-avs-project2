@@ -9,9 +9,10 @@ Login: xharmi00
 1) Kterou ze smyček (viz zadání) je vhodnější paralelizovat a co způsobuje
    neefektivitu paralelizace té druhé?
 
-- Vhodnější je paralelizovat smyčku průchodu mřížkou v metodě 'marchCubes'.
-  Neefektivitu paralelizace druhé smyčky (výpočet minimální vzdálenosti v metodě
-  'evaluateFieldAt') pravděpodobně způsobuje lokalita dat.
+- Vhodnější je paralelizovat smyčku průchodu mřížkou v metodě 'marchCubes',
+  protože tato se volá na vyšší úrovni. Neefektivitu paralelizace druhé smyčky
+  (výpočet minimální vzdálenosti v metodě 'evaluateFieldAt') pravděpodobně
+  způsobuje lokalita dat a/nebo vytváření velkého počtu vláken.
 
 
 2) Jaké plánování (rozdělení práce mezi vlákna) jste zvolili a proč?
@@ -65,11 +66,11 @@ Login: xharmi00
    task pro každou krychli na nejnižší úrovni?
 
 - Pokud je hloubka "cut-off" větší než 1, tak výpočet není přesný, jinými slovy,
-  nejsou vytvořeny všechny trojúhelníky. Pokud je tato hodnota naopak  menší než
-  1, tak můžou být některé trojúhelníky spočteny vícekrát a výpočet potom trvá
-  zbytečně déle. Proto jsem tuto hodnotu nastavil na 1. Na nejnižší úrovni už
-  nemá smysl vytvářet nový task, protože jediná úloha tasku na nejnižší úrovni
-  je samotné generování trojúhelníků.
+  nejsou vytvořeny všechny trojúhelníky. Pokud je tato hodnota naopak menší než
+  1, tak můžou být některé trojúhelníky spočteny vícekrát a některé vůbec
+  a výpočet potom trvá déle. Proto jsem tuto hodnotu nastavil na 1. Na nejnižší
+  úrovni už nemá smysl vytvářet nový task, protože jediná úloha tasku na
+  nejnižší úrovni je samotné generování trojúhelníků.
 
 
 4) Jakým způsobem zajišťujete ukládání trojúhelníků z několika vláken současně?
@@ -93,10 +94,11 @@ Login: xharmi00
   algoritmus je efektivnější pro všechny testované případy. U obou řešení, pro
   dostatečně velký vstup, čas výpočtu klesá s rostoucím počtem vláken. U menších
   vstupů, při dosažení určitého počtu vláken, se klesání času výpočtu zastaví
-  nebo se dokonce i mírně zvýší. V grafu slabého škálování vhledem k velikosti
-  vstupu a počtu vláken je vidět, že u stromového algoritmu roste zátěž na jedno
-  vlákno s rostoucím počtem vláken. U druhého řešení je u dostatečně velkého
-  vstupu tato závislost přibližně konstantní.
+  nebo se dokonce i mírně zvýší. V tomto grafu je také vidět, že stromový
+  algoritmus škáluje hůře než algoritmus z 1. úlohy. V grafu slabého škálování
+  vhledem k velikosti vstupu a počtu vláken je vidět, že u stromového algoritmu
+  roste zátěž na jedno vlákno s rostoucím počtem vláken. U druhého řešení je
+  u dostatečně velkého vstupu tato závislost přibližně konstantní.
 
 
 2) V jakém případě (v závislosti na počtu bodů ve vstupním souboru a velikosti
@@ -110,5 +112,5 @@ Login: xharmi00
 3) Je (nebo není) stromový algoritmus efektivnější z pohledu slabého škálování
    vzhledem ke vstupu?
 
-- Stromový algoritmus je z pohledu slabého škálování vzhledem ke vstupu
-  efektivnější.
+- Stromový algoritmus není z pohledu slabého škálování vzhledem ke vstupu
+  efektivnější. Tento algoritmus neškáluje při menším vstupu.
